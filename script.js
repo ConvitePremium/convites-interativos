@@ -29,11 +29,11 @@ const observer = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (entry.isIntersecting) entry.target.classList.add('visible');
   });
-}, { threshold: 0.12 });
+}, { threshold: 0.1 });
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-document.querySelectorAll('.model-media img, .hero-demo img').forEach(img => {
+document.querySelectorAll('.cover-link img').forEach(img => {
   img.addEventListener('error', () => {
     img.style.display = 'none';
     img.parentElement.classList.add('missing-cover');

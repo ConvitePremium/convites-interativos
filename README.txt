@@ -1,27 +1,12 @@
-SITE — CONVITES INTERATIVOS
-
-COMO PERSONALIZAR
+SITE CONVITES INTERATIVOS — COMO CONFIGURAR
 
 1. Abra o arquivo config.js.
-2. Troque o número do WhatsApp.
-3. Na área "exemplos", cole os links reais dos convites publicados no GitHub Pages.
+2. Troque o número provisório do WhatsApp pelo seu número com DDI e DDD.
+   Exemplo: 5511999999999
+3. Cole os links reais dos três convites nos campos:
+   infantil, quinzeAnos e casamento.
+4. As capas já estão em WEBP dentro da pasta assets.
+5. Envie todo o conteúdo desta pasta para o repositório GitHub Pages.
 
-Exemplo:
-infantil: "https://seuusuario.github.io/convite-infantil/"
-
-CAPAS DOS EXEMPLOS
-
-Coloque estas quatro imagens dentro da pasta assets:
-
-- capa-destaque.webp
-- capa-infantil.webp
-- capa-15anos.webp
-- capa-casamento.webp
-
-As capas aparecem no site. Quando o visitante clicar, o convite real será aberto em uma nova aba, permitindo testar vídeo, música, botões e páginas interativas.
-
-Não é necessário colocar os vídeos dos convites dentro deste site.
-
-PUBLICAÇÃO
-
-Suba todos os arquivos para um repositório do GitHub e ative o GitHub Pages em Settings > Pages.
+Nome recomendado para o repositório:
+convites-interativos
