@@ -1,12 +1,10 @@
-SITE CONVITES INTERATIVOS — COMO CONFIGURAR
+CONVITE PREMIUM — SITE V2
 
-1. Abra o arquivo config.js.
-2. Troque o número provisório do WhatsApp pelo seu número com DDI e DDD.
-   Exemplo: 5511999999999
-3. Cole os links reais dos três convites nos campos:
-   infantil, quinzeAnos e casamento.
-4. As capas já estão em WEBP dentro da pasta assets.
-5. Envie todo o conteúdo desta pasta para o repositório GitHub Pages.
-
-Nome recomendado para o repositório:
-convites-interativos
+1. Publique todos os arquivos na raiz do repositório do GitHub.
+2. Os links e o WhatsApp continuam no arquivo config.js.
+3. As capas ficam na pasta assets com estes nomes:
+   capa-infantil.webp
+   capa-15anos.webp
+   capa-casamento.webp
+4. O celular do topo alterna automaticamente entre as três capas.
+5. No celular, as três categorias podem ser arrastadas horizontalmente.
