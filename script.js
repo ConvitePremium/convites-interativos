@@ -39,3 +39,19 @@ document.querySelectorAll('.cover-link img').forEach(img => {
     img.parentElement.classList.add('missing-cover');
   });
 });
+
+
+// Alterna automaticamente as capas exibidas dentro do celular do topo.
+const phoneSlides = Array.from(document.querySelectorAll('.phone-demo'));
+if (phoneSlides.length > 1) {
+  let activePhoneSlide = 0;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reduceMotion) {
+    window.setInterval(() => {
+      phoneSlides[activePhoneSlide].classList.remove('is-active');
+      activePhoneSlide = (activePhoneSlide + 1) % phoneSlides.length;
+      phoneSlides[activePhoneSlide].classList.add('is-active');
+    }, 3500);
+  }
+}
