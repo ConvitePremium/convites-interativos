@@ -47,12 +47,8 @@ const exampleDots = [...document.querySelectorAll('.example-dots button')];
 const dragHint = document.querySelector('.drag-hint');
 let exampleScrollTimer;
 
-function setActiveExample(index, animate = false) {
+function setActiveExample(index) {
   exampleDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
-  exampleCards.forEach((card, i) => {
-    card.classList.toggle('is-active', animate && i === index);
-    if (animate && i === index) setTimeout(() => card.classList.remove('is-active'), 420);
-  });
 }
 
 function nearestExampleIndex() {
@@ -73,14 +69,14 @@ if (exampleCarousel && exampleCards.length) {
     clearTimeout(exampleScrollTimer);
     exampleScrollTimer = setTimeout(() => {
       const index = nearestExampleIndex();
-      setActiveExample(index, true);
+      setActiveExample(index);
       if (dragHint) dragHint.style.opacity = '0';
     }, 90);
   }, { passive: true });
 
   exampleDots.forEach((dot, index) => dot.addEventListener('click', () => {
     exampleCards[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
-    setActiveExample(index, true);
+    setActiveExample(index);
     if (dragHint) dragHint.style.opacity = '0';
   }));
 }
