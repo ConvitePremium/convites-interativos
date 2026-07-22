@@ -38,3 +38,49 @@ document.querySelectorAll('.cover-link img').forEach(img => img.addEventListener
   img.alt = 'Imagem indisponível';
   img.style.opacity = '.2';
 }));
+
+
+// Carrossel dos exemplos no celular: prévia do próximo card + indicadores sincronizados.
+const exampleCarousel = document.getElementById('exampleCarousel');
+const exampleCards = exampleCarousel ? [...exampleCarousel.querySelectorAll('.example-card')] : [];
+const exampleDots = [...document.querySelectorAll('.example-dots button')];
+const dragHint = document.querySelector('.drag-hint');
+let exampleScrollTimer;
+
+function setActiveExample(index, animate = false) {
+  exampleDots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+  exampleCards.forEach((card, i) => {
+    card.classList.toggle('is-active', animate && i === index);
+    if (animate && i === index) setTimeout(() => card.classList.remove('is-active'), 420);
+  });
+}
+
+function nearestExampleIndex() {
+  if (!exampleCarousel || !exampleCards.length) return 0;
+  const left = exampleCarousel.scrollLeft;
+  let closest = 0;
+  let distance = Infinity;
+  exampleCards.forEach((card, index) => {
+    const current = Math.abs(card.offsetLeft - left - 20);
+    if (current < distance) { distance = current; closest = index; }
+  });
+  return closest;
+}
+
+if (exampleCarousel && exampleCards.length) {
+  setActiveExample(0);
+  exampleCarousel.addEventListener('scroll', () => {
+    clearTimeout(exampleScrollTimer);
+    exampleScrollTimer = setTimeout(() => {
+      const index = nearestExampleIndex();
+      setActiveExample(index, true);
+      if (dragHint) dragHint.style.opacity = '0';
+    }, 90);
+  }, { passive: true });
+
+  exampleDots.forEach((dot, index) => dot.addEventListener('click', () => {
+    exampleCards[index]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    setActiveExample(index, true);
+    if (dragHint) dragHint.style.opacity = '0';
+  }));
+}

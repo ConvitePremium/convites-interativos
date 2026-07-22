@@ -57,10 +57,20 @@
 
     <section class="section examples" id="exemplos">
       <div class="section-intro reveal"><span class="pill light">Experimente de verdade</span><h2>Escolha uma celebração</h2><p>Abra um exemplo completo e teste o vídeo, a música, os botões e todas as páginas interativas.</p></div>
-      <div class="example-grid">
-        <article class="example-card reveal"><a class="js-demo-link" data-demo="infantil" href="#"><img src="assets/capa-infantil.webp" alt="Convite infantil"><span class="example-overlay"><b>Mundo Infantil</b><small>Testar convite completo →</small></span></a></article>
-        <article class="example-card reveal"><a class="js-demo-link" data-demo="quinzeAnos" href="#"><img src="assets/capa-15anos.webp" alt="Convite de 15 anos"><span class="example-overlay"><b>Debutantes</b><small>Testar convite completo →</small></span></a></article>
-        <article class="example-card reveal"><a class="js-demo-link" data-demo="casamento" href="#"><img src="assets/capa-casamento.webp" alt="Convite de casamento"><span class="example-overlay"><b>Casamentos</b><small>Testar convite completo →</small></span></a></article>
+      <div class="example-carousel">
+        <div class="example-grid" id="exampleCarousel">
+          <article class="example-card reveal"><a class="js-demo-link" data-demo="infantil" href="#"><img src="assets/capa-infantil.webp" alt="Convite infantil"><span class="example-overlay"><b>Mundo Infantil</b><small>Testar convite completo →</small></span></a></article>
+          <article class="example-card reveal"><a class="js-demo-link" data-demo="quinzeAnos" href="#"><img src="assets/capa-15anos.webp" alt="Convite de 15 anos"><span class="example-overlay"><b>Debutantes</b><small>Testar convite completo →</small></span></a></article>
+          <article class="example-card reveal"><a class="js-demo-link" data-demo="casamento" href="#"><img src="assets/capa-casamento.webp" alt="Convite de casamento"><span class="example-overlay"><b>Casamentos</b><small>Testar convite completo →</small></span></a></article>
+        </div>
+        <div class="example-nav" aria-label="Navegação dos exemplos">
+          <span class="drag-hint" aria-hidden="true">Arraste para o lado <b>→</b></span>
+          <div class="example-dots">
+            <button class="active" type="button" aria-label="Ver convite infantil"></button>
+            <button type="button" aria-label="Ver convite de 15 anos"></button>
+            <button type="button" aria-label="Ver convite de casamento"></button>
+          </div>
+        </div>
       </div>
     </section>
 
