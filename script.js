@@ -34,23 +34,34 @@ document.querySelectorAll('.pedido-info').forEach(button => {
     button.textContent = detail.hidden ? 'Saiba mais' : 'Ocultar explicação';
   });
 });
-const reais = value => value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const PRECO_CONVITE_CENTAVOS = 9990;
+const PRECO_SAVE_CENTAVOS = 1990;
+const PRECO_ALBUM_CENTAVOS = 3990;
+const reais = centavos => (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+function calcularPedido() {
+  const save = pedidoForm.elements.save.checked;
+  const album = pedidoForm.elements.album.checked;
+  const adicionais = (save ? PRECO_SAVE_CENTAVOS : 0) + (album ? PRECO_ALBUM_CENTAVOS : 0);
+  return { save, album, adicionais, total: PRECO_CONVITE_CENTAVOS + adicionais };
+}
 function atualizarTotal() {
-  const total = (pedidoForm.elements.save.checked ? 19.90 : 0) + (pedidoForm.elements.album.checked ? 39.90 : 0);
-  document.getElementById('pedidoTotal').textContent = 'Adicionais: ' + reais(total);
+  const pedido = calcularPedido();
+  document.getElementById('pedidoTotal').textContent =
+    'Convite: ' + reais(PRECO_CONVITE_CENTAVOS) + ' | Adicionais: ' + reais(pedido.adicionais) + ' | Total: ' + reais(pedido.total);
 }
 pedidoForm.elements.save.addEventListener('change', atualizarTotal);
 pedidoForm.elements.album.addEventListener('change', atualizarTotal);
+atualizarTotal();
 pedidoForm.addEventListener('submit', event => {
   event.preventDefault();
   if (!pedidoForm.reportValidity()) return;
   if (!number) { alert('Configure o número do WhatsApp no config.js.'); return; }
   const fields = pedidoForm.elements;
   const [ano, mes, dia] = fields.data.value.split('-');
+  const pedido = calcularPedido();
   const adicionais = [];
-  if (fields.save.checked) adicionais.push('Save the Date - R$ 19,90');
-  if (fields.album.checked) adicionais.push('Álbum Online + QR Code de Mesa - R$ 39,90');
-  const total = (fields.save.checked ? 19.90 : 0) + (fields.album.checked ? 39.90 : 0);
+  if (pedido.save) adicionais.push('Save the Date - ' + reais(PRECO_SAVE_CENTAVOS));
+  if (pedido.album) adicionais.push('Álbum Online + QR Code de Mesa - ' + reais(PRECO_ALBUM_CENTAVOS));
   const mensagem = [
     '*Olá! Quero solicitar meu convite personalizado.*',
     '',
@@ -60,9 +71,12 @@ pedidoForm.addEventListener('submit', event => {
     '*Horário:* ' + fields.horario.value,
     '*Tema e cores:* ' + fields.tema.value.trim(),
     '',
+    '*Convite personalizado:* ' + reais(PRECO_CONVITE_CENTAVOS),
+    '',
     '*Adicionais:*',
     ...(adicionais.length ? adicionais.map(a => '- ' + a) : ['Nenhum']),
-    '*Total dos adicionais:* ' + reais(total),
+    '*Subtotal dos adicionais:* ' + reais(pedido.adicionais),
+    '*VALOR TOTAL DO PEDIDO:* ' + reais(pedido.total),
     '',
     'Aguardo as próximas orientações. Obrigada!'
   ].join('\n');
