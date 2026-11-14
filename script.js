@@ -80,3 +80,14 @@ if (exampleCarousel && exampleCards.length) {
     if (dragHint) dragHint.style.opacity = '0';
   }));
 }
+
+// Explicações opcionais: o cliente lê antes de selecionar o adicional.
+document.querySelectorAll('.pedido-info-toggle').forEach(botao => {
+  botao.addEventListener('click', () => {
+    const painel = document.getElementById(botao.getAttribute('aria-controls'));
+    const aberto = botao.getAttribute('aria-expanded') === 'true';
+    painel.hidden = aberto;
+    botao.setAttribute('aria-expanded', String(!aberto));
+    botao.querySelector('span').textContent = aberto ? 'Saiba mais +' : 'Ocultar −';
+  });
+});
