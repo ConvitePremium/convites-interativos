@@ -134,32 +134,28 @@ function itensDaCategoria(categoria) {
   itens.push({titulo:'Crie seu próprio modelo', personalizado:true});
   return itens;
 }
+const POSICOES_MODELOS = [
+  {x:0,y:0,angle:0,scale:1},
+  {x:36,y:4,angle:8,scale:.97},
+  {x:-36,y:8,angle:-8,scale:.94},
+  {x:52,y:12,angle:12,scale:.91}
+];
+let animandoModelos = false;
+let cartoesModelos = [];
+function posicaoModelo(offset){
+  const p=POSICOES_MODELOS[offset];
+  return `translateX(calc(-50% + ${p.x}px)) translateY(${p.y}px) rotate(${p.angle}deg) scale(${p.scale})`;
+}
 function renderizarModelos(){
   const itens=itensDaCategoria(categoriaAtual);
   modelosStage.replaceChildren();
-  // Cartões realmente sobrepostos, sem bordas ou molduras Polaroid.
-  for(let offset=itens.length-1;offset>=0;offset--){
-    const index=(modeloAtual+offset)%itens.length;
-    const item=itens[index];
+  cartoesModelos=[];
+  for(let i=0;i<itens.length;i++){
+    const item=itens[i];
     const card=document.createElement('button');
     card.type='button';card.className='modelo-card';
-    card.style.setProperty('--layer',String(offset));
-    // Cada cartão de trás permanece visível nas laterais, com inclinações alternadas.
-    const camadas=[
-      {x:0,y:0,angle:0,scale:1},
-      {x:36,y:4,angle:8,scale:.97},
-      {x:-36,y:8,angle:-8,scale:.94},
-      {x:52,y:12,angle:12,scale:.91}
-    ];
-    const camada=camadas[offset];
-    card.style.setProperty('--shift-x',camada.x+'px');
-    card.style.setProperty('--shift-y',camada.y+'px');
-    card.style.setProperty('--tilt',camada.angle+'deg');
-    card.style.setProperty('--card-scale',String(camada.scale));
-    card.style.zIndex=String(10-offset);
+    card.dataset.modeloIndex=String(i);
     card.setAttribute('aria-label',item.titulo);
-    card.tabIndex=offset===0?0:-1;
-    if(offset!==0){card.setAttribute('aria-hidden','true');card.tabIndex=-1;}
     if(item.personalizado){
       card.classList.add('modelo-personalizado');
       card.innerHTML='<span class="modelo-personalizado-icone">✦</span><strong>Crie seu próprio modelo</strong><small>Um convite exclusivo com o seu tema e suas cores</small><span class="modelo-acao">Personalizar meu convite →</span>';
@@ -172,20 +168,66 @@ function renderizarModelos(){
       info.append(titulo,detalhe);card.appendChild(info);
     }
     card.addEventListener('click',()=>{
-      if(offset!==0)return;
+      if(animandoModelos || Number(card.dataset.modeloIndex)!==modeloAtual)return;
       if(item.personalizado){fecharModelos();abrirPedido({preventDefault(){},currentTarget:galeriaTrigger});return;}
       if(!item.link){alert('Este exemplo ainda será adicionado. Use as setas para ver outros modelos.');return;}
       window.open(item.link,'_blank','noopener,noreferrer');
     });
-    modelosStage.appendChild(card);
+    modelosStage.appendChild(card);cartoesModelos.push(card);
   }
-  modelosPosition.textContent=`${modeloAtual+1} de ${itens.length}`;
+  posicionarModelos();
+}
+function posicionarModelos(){
+  cartoesModelos.forEach((card,i)=>{
+    const offset=(i-modeloAtual+cartoesModelos.length)%cartoesModelos.length;
+    card.style.transform=posicaoModelo(offset);
+    card.style.zIndex=String(10-offset);
+    card.style.opacity='1';
+    card.tabIndex=offset===0?0:-1;
+    if(offset===0)card.removeAttribute('aria-hidden');
+    else card.setAttribute('aria-hidden','true');
+  });
+  modelosPosition.textContent=`${modeloAtual+1} de ${cartoesModelos.length}`;
+}
+function navegarModelos(direcao){
+  if(animandoModelos || modelosOverlay.hidden)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    modeloAtual=(modeloAtual+direcao+4)%4;posicionarModelos();return;
+  }
+  animandoModelos=true;
+  const anterior=modeloAtual;
+  const proximo=(anterior+direcao+4)%4;
+  const animacoes=[];
+  cartoesModelos.forEach((card,i)=>{
+    const de=(i-anterior+4)%4;
+    const para=(i-proximo+4)%4;
+    const sai=de===0;
+    const entra=para===0;
+    const origem=posicaoModelo(de), destino=posicaoModelo(para);
+    // O cartão da frente abre espaço; o de trás avança com escala e rotação suaves.
+    const frames=sai ? [
+      {transform:origem,opacity:1,offset:0},
+      {transform:`translateX(calc(-50% + ${direcao===1?-105:105}px)) translateY(-8px) rotate(${direcao===1?-12:12}deg) scale(1.035)`,opacity:1,offset:.38},
+      {transform:destino,opacity:1,offset:1}
+    ] : [
+      {transform:origem,opacity:1},
+      {transform:destino,opacity:1}
+    ];
+    card.style.zIndex=String(sai?20:entra?19:10-para);
+    const anim=card.animate(frames,{duration:650,easing:'cubic-bezier(.22,.72,.18,1)',fill:'forwards'});
+    animacoes.push(anim.finished.catch(()=>{}));
+  });
+  Promise.all(animacoes).then(()=>{
+    modeloAtual=proximo;
+    cartoesModelos.forEach(card=>card.getAnimations().forEach(a=>a.cancel()));
+    posicionarModelos();animandoModelos=false;
+  });
 }
 function abrirModelos(e){
   e.preventDefault();galeriaTrigger=e.currentTarget;
   categoriaAtual=e.currentTarget.dataset.demo;modeloAtual=0;
   modelosTitle.textContent=nomesCategorias[categoriaAtual];
-  modelosOverlay.hidden=false;document.body.classList.add('modelos-open');
+  modelosOverlay.hidden=false;document.body.classList.add('modelos-open');animandoModelos=false;
   renderizarModelos();document.getElementById('modelosClose').focus();
 }
 function fecharModelos(){
@@ -195,17 +237,17 @@ function fecharModelos(){
 document.querySelectorAll('.js-category-link').forEach(link=>link.addEventListener('click',abrirModelos));
 document.getElementById('modelosClose').addEventListener('click',fecharModelos);
 modelosOverlay.addEventListener('click',e=>{if(e.target===modelosOverlay)fecharModelos();});
-document.getElementById('modelosPrev').addEventListener('click',()=>{modeloAtual=(modeloAtual+3)%4;renderizarModelos();});
-document.getElementById('modelosNext').addEventListener('click',()=>{modeloAtual=(modeloAtual+1)%4;renderizarModelos();});
+document.getElementById('modelosPrev').addEventListener('click',()=>navegarModelos(-1));
+document.getElementById('modelosNext').addEventListener('click',()=>navegarModelos(1));
 document.addEventListener('keydown',e=>{
   if(modelosOverlay.hidden)return;
   if(e.key==='Escape')fecharModelos();
-  if(e.key==='ArrowRight'){modeloAtual=(modeloAtual+1)%4;renderizarModelos();}
-  if(e.key==='ArrowLeft'){modeloAtual=(modeloAtual+3)%4;renderizarModelos();}
+  if(e.key==='ArrowRight')navegarModelos(1);
+  if(e.key==='ArrowLeft')navegarModelos(-1);
 });
 let touchX=0;
 modelosStage.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
-modelosStage.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>45){modeloAtual=(modeloAtual+(delta<0?1:3))%4;renderizarModelos();}},{passive:true});
+modelosStage.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>45)navegarModelos(delta<0?1:-1);},{passive:true});
 
 document.getElementById('year').textContent = new Date().getFullYear();
 

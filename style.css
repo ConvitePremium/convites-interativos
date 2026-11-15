@@ -84,3 +84,7 @@ body.modelos-open{overflow:hidden}
   .modelos-stage{height:min(52dvh, 470px);width:min(100%,360px);margin:14px auto 16px}
   .modelo-card{border-radius:8px}
 }
+
+/* Movimento gerenciado pelo navegador: preserva 9:16 e evita saltos ao trocar cartões. */
+.modelo-card{transition:none!important;will-change:transform;backface-visibility:hidden}
+@media(prefers-reduced-motion:reduce){.modelo-card{will-change:auto}}
