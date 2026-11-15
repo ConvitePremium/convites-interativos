@@ -37,17 +37,29 @@ document.querySelectorAll('.pedido-info').forEach(button => {
 const PRECO_CONVITE_CENTAVOS = 9990;
 const PRECO_SAVE_CENTAVOS = 1990;
 const PRECO_ALBUM_CENTAVOS = 3990;
+const PRECO_COMBO_CENTAVOS = 14500;
 const reais = centavos => (centavos / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 function calcularPedido() {
   const save = pedidoForm.elements.save.checked;
   const album = pedidoForm.elements.album.checked;
   const adicionais = (save ? PRECO_SAVE_CENTAVOS : 0) + (album ? PRECO_ALBUM_CENTAVOS : 0);
-  return { save, album, adicionais, total: PRECO_CONVITE_CENTAVOS + adicionais };
+  const subtotal = PRECO_CONVITE_CENTAVOS + adicionais;
+  const combo = save && album;
+  const total = combo ? PRECO_COMBO_CENTAVOS : subtotal;
+  return { save, album, adicionais, subtotal, combo, desconto: subtotal - total, total };
 }
 function atualizarTotal() {
   const pedido = calcularPedido();
-  document.getElementById('pedidoTotal').textContent =
-    'Convite: ' + reais(PRECO_CONVITE_CENTAVOS) + ' | Adicionais: ' + reais(pedido.adicionais) + ' | Total: ' + reais(pedido.total);
+  const resumo = document.getElementById('pedidoTotal');
+  resumo.textContent = 'Convite: ' + reais(PRECO_CONVITE_CENTAVOS) +
+    ' | Adicionais: ' + reais(pedido.adicionais) +
+    (pedido.combo ? ' | Valor original: ' + reais(pedido.subtotal) +
+      ' | Desconto combo: -' + reais(pedido.desconto) : '') +
+    ' | Total: ' + reais(pedido.total);
+  const promo = document.getElementById('pedidoCombo');
+  promo.hidden = !pedido.combo;
+  document.getElementById('pedidoComboOriginal').textContent = reais(pedido.subtotal);
+  document.getElementById('pedidoComboFinal').textContent = reais(pedido.total);
 }
 pedidoForm.elements.save.addEventListener('change', atualizarTotal);
 pedidoForm.elements.album.addEventListener('change', atualizarTotal);
@@ -76,6 +88,10 @@ pedidoForm.addEventListener('submit', event => {
     '*Adicionais:*',
     ...(adicionais.length ? adicionais.map(a => '- ' + a) : ['Nenhum']),
     '*Subtotal dos adicionais:* ' + reais(pedido.adicionais),
+    ...(pedido.combo ? [
+      '*Valor original:* ' + reais(pedido.subtotal),
+      '*Combo promocional (9% OFF):* -' + reais(pedido.desconto)
+    ] : []),
     '*VALOR TOTAL DO PEDIDO:* ' + reais(pedido.total),
     '',
     'Aguardo as próximas orientações. Obrigada!'
