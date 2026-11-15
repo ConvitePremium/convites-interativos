@@ -48,3 +48,39 @@ body.modelos-open{overflow:hidden}
 .modelos-controls button{border:1px solid #bb9751;border-radius:50%;width:47px;height:47px;background:#fff;color:#6a4a1f;font-size:31px;cursor:pointer;line-height:1}
 .modelos-controls span{font-weight:800;font-size:13px;min-width:48px}
 @media(max-width:480px){.modelos-stage{height:min(57dvh,420px)}.modelo-card{inset:8px 25px 9px}.modelos-dialog{padding:22px 12px 14px}}
+
+/* Correção: capas completas em 9:16 e camadas visivelmente inclinadas */
+.modelos-stage{
+  height:min(57dvh, 510px);
+  min-height:260px;
+  width:min(100%, 420px);
+  max-width:none;
+  margin:18px auto 20px;
+  overflow:visible;
+}
+.modelo-card{
+  inset:auto;
+  top:0;
+  left:50%;
+  height:100%;
+  width:auto;
+  aspect-ratio:9 / 16;
+  border-radius:10px;
+  transform-origin:50% 65%;
+  transform:translateX(calc(-50% + var(--shift-x, 0px))) translateY(var(--shift-y, 0px)) rotate(var(--tilt, 0deg)) scale(var(--card-scale, 1));
+  transition:transform .4s cubic-bezier(.2,.75,.25,1),box-shadow .4s ease;
+  box-shadow:0 12px 32px rgba(14,20,35,.30);
+}
+.modelo-card img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
+  background:#e7dfd2;
+}
+.modelo-card[aria-hidden=true]{filter:brightness(.94)}
+@media(max-width:540px){
+  .modelos-dialog{padding:22px 12px 15px}
+  .modelos-stage{height:min(52dvh, 470px);width:min(100%,360px);margin:14px auto 16px}
+  .modelo-card{border-radius:8px}
+}

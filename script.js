@@ -144,6 +144,18 @@ function renderizarModelos(){
     const card=document.createElement('button');
     card.type='button';card.className='modelo-card';
     card.style.setProperty('--layer',String(offset));
+    // Cada cartão de trás permanece visível nas laterais, com inclinações alternadas.
+    const camadas=[
+      {x:0,y:0,angle:0,scale:1},
+      {x:36,y:4,angle:8,scale:.97},
+      {x:-36,y:8,angle:-8,scale:.94},
+      {x:52,y:12,angle:12,scale:.91}
+    ];
+    const camada=camadas[offset];
+    card.style.setProperty('--shift-x',camada.x+'px');
+    card.style.setProperty('--shift-y',camada.y+'px');
+    card.style.setProperty('--tilt',camada.angle+'deg');
+    card.style.setProperty('--card-scale',String(camada.scale));
     card.style.zIndex=String(10-offset);
     card.setAttribute('aria-label',item.titulo);
     card.tabIndex=offset===0?0:-1;
