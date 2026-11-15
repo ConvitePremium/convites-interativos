@@ -112,13 +112,88 @@ pedidoForm.addEventListener('submit', event => {
   }
 });
 
-document.querySelectorAll('.js-demo-link').forEach(link => {
-  const url = cfg.exemplos && cfg.exemplos[link.dataset.demo];
-  link.href = url || "#";
-  link.target = "_blank";
-  link.rel = "noopener noreferrer";
-  if (!url || url.includes('SEU-USUARIO')) link.addEventListener('click', e => { e.preventDefault(); alert('Adicione o link deste convite no arquivo config.js.'); });
+// Galeria por categoria: mantém o carrossel original da vitrine.
+const modelosOverlay = document.getElementById('modelosOverlay');
+const modelosStage = document.getElementById('modelosStage');
+const modelosTitle = document.getElementById('modelosTitle');
+const modelosPosition = document.getElementById('modelosPosition');
+const nomesCategorias = { infantil:'Convites Infantis', quinzeAnos:'Convites de 15 Anos', casamento:'Convites de Casamento' };
+const capasCategorias = { infantil:'assets/capa-infantil.webp', quinzeAnos:'assets/capa-15anos.webp', casamento:'assets/capa-casamento.webp' };
+let categoriaAtual = 'infantil';
+let modeloAtual = 0;
+let galeriaTrigger = null;
+function itensDaCategoria(categoria) {
+  const definidos = cfg.galerias && cfg.galerias[categoria];
+  const antigo = cfg.exemplos && cfg.exemplos[categoria] || '';
+  const padrao = capasCategorias[categoria];
+  const itens = Array.from({length:3}, (_, i) => {
+    const info = Array.isArray(definidos) ? definidos[i] || {} : {};
+    return { titulo: info.titulo || `Modelo ${i+1}`, capa: info.capa || padrao,
+      link: info.link || (i === 0 ? antigo : '') };
+  });
+  itens.push({titulo:'Crie seu próprio modelo', personalizado:true});
+  return itens;
+}
+function renderizarModelos(){
+  const itens=itensDaCategoria(categoriaAtual);
+  modelosStage.replaceChildren();
+  // Cartões realmente sobrepostos, sem bordas ou molduras Polaroid.
+  for(let offset=itens.length-1;offset>=0;offset--){
+    const index=(modeloAtual+offset)%itens.length;
+    const item=itens[index];
+    const card=document.createElement('button');
+    card.type='button';card.className='modelo-card';
+    card.style.setProperty('--layer',String(offset));
+    card.style.zIndex=String(10-offset);
+    card.setAttribute('aria-label',item.titulo);
+    card.tabIndex=offset===0?0:-1;
+    if(offset!==0){card.setAttribute('aria-hidden','true');card.tabIndex=-1;}
+    if(item.personalizado){
+      card.classList.add('modelo-personalizado');
+      card.innerHTML='<span class="modelo-personalizado-icone">✦</span><strong>Crie seu próprio modelo</strong><small>Um convite exclusivo com o seu tema e suas cores</small><span class="modelo-acao">Personalizar meu convite →</span>';
+    }else{
+      const img=document.createElement('img');img.src=item.capa;img.alt='Capa do '+item.titulo;
+      card.appendChild(img);
+      const info=document.createElement('span');info.className='modelo-caption';
+      const titulo=document.createElement('strong');titulo.textContent=item.titulo;
+      const detalhe=document.createElement('small');detalhe.textContent=item.link?'Toque para abrir o convite →':'Exemplo em preparação';
+      info.append(titulo,detalhe);card.appendChild(info);
+    }
+    card.addEventListener('click',()=>{
+      if(offset!==0)return;
+      if(item.personalizado){fecharModelos();abrirPedido({preventDefault(){},currentTarget:galeriaTrigger});return;}
+      if(!item.link){alert('Este exemplo ainda será adicionado. Use as setas para ver outros modelos.');return;}
+      window.open(item.link,'_blank','noopener,noreferrer');
+    });
+    modelosStage.appendChild(card);
+  }
+  modelosPosition.textContent=`${modeloAtual+1} de ${itens.length}`;
+}
+function abrirModelos(e){
+  e.preventDefault();galeriaTrigger=e.currentTarget;
+  categoriaAtual=e.currentTarget.dataset.demo;modeloAtual=0;
+  modelosTitle.textContent=nomesCategorias[categoriaAtual];
+  modelosOverlay.hidden=false;document.body.classList.add('modelos-open');
+  renderizarModelos();document.getElementById('modelosClose').focus();
+}
+function fecharModelos(){
+  modelosOverlay.hidden=true;document.body.classList.remove('modelos-open');
+  if(galeriaTrigger)galeriaTrigger.focus();
+}
+document.querySelectorAll('.js-category-link').forEach(link=>link.addEventListener('click',abrirModelos));
+document.getElementById('modelosClose').addEventListener('click',fecharModelos);
+modelosOverlay.addEventListener('click',e=>{if(e.target===modelosOverlay)fecharModelos();});
+document.getElementById('modelosPrev').addEventListener('click',()=>{modeloAtual=(modeloAtual+3)%4;renderizarModelos();});
+document.getElementById('modelosNext').addEventListener('click',()=>{modeloAtual=(modeloAtual+1)%4;renderizarModelos();});
+document.addEventListener('keydown',e=>{
+  if(modelosOverlay.hidden)return;
+  if(e.key==='Escape')fecharModelos();
+  if(e.key==='ArrowRight'){modeloAtual=(modeloAtual+1)%4;renderizarModelos();}
+  if(e.key==='ArrowLeft'){modeloAtual=(modeloAtual+3)%4;renderizarModelos();}
 });
+let touchX=0;
+modelosStage.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
+modelosStage.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>45){modeloAtual=(modeloAtual+(delta<0?1:3))%4;renderizarModelos();}},{passive:true});
 
 document.getElementById('year').textContent = new Date().getFullYear();
 

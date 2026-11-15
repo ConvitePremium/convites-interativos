@@ -57,12 +57,12 @@
     </section>
 
     <section class="section examples" id="exemplos">
-      <div class="section-intro reveal"><span class="pill light">Experimente de verdade</span><h2>Escolha uma celebração</h2><p>Abra um exemplo completo e teste o vídeo, a música, os botões e todas as páginas interativas.</p></div>
+      <div class="section-intro reveal"><span class="pill light">Experimente de verdade</span><h2>Escolha uma celebração</h2><p>Escolha uma categoria e descubra os modelos disponíveis. Deslize para conhecer todas as opções.</p></div>
       <div class="example-carousel">
         <div class="example-grid" id="exampleCarousel">
-          <article class="example-card reveal"><a class="js-demo-link" data-demo="infantil" href="#"><img src="assets/capa-infantil.webp" alt="Convite infantil"><span class="example-overlay"><b>Mundo Infantil</b><small>Testar convite completo →</small></span></a></article>
-          <article class="example-card reveal"><a class="js-demo-link" data-demo="quinzeAnos" href="#"><img src="assets/capa-15anos.webp" alt="Convite de 15 anos"><span class="example-overlay"><b>Debutantes</b><small>Testar convite completo →</small></span></a></article>
-          <article class="example-card reveal"><a class="js-demo-link" data-demo="casamento" href="#"><img src="assets/capa-casamento.webp" alt="Convite de casamento"><span class="example-overlay"><b>Casamentos</b><small>Testar convite completo →</small></span></a></article>
+          <article class="example-card reveal"><h3 class="example-category-title">Convite Infantil</h3><a class="js-category-link" data-demo="infantil" href="#modelos"><img src="assets/capa-infantil.webp" alt="Convite infantil"><span class="example-overlay"><b>Mundo Infantil</b><small>Ver modelos disponíveis →</small></span></a></article>
+          <article class="example-card reveal"><h3 class="example-category-title">Convite 15 Anos</h3><a class="js-category-link" data-demo="quinzeAnos" href="#modelos"><img src="assets/capa-15anos.webp" alt="Convite de 15 anos"><span class="example-overlay"><b>Debutantes</b><small>Ver modelos disponíveis →</small></span></a></article>
+          <article class="example-card reveal"><h3 class="example-category-title">Convite Casamento</h3><a class="js-category-link" data-demo="casamento" href="#modelos"><img src="assets/capa-casamento.webp" alt="Convite de casamento"><span class="example-overlay"><b>Casamentos</b><small>Ver modelos disponíveis →</small></span></a></article>
         </div>
         <div class="example-nav" aria-label="Navegação dos exemplos">
           <span class="drag-hint" aria-hidden="true">Arraste para o lado <b>→</b></span>
@@ -167,6 +167,22 @@
   <footer><a href="#inicio" class="brand brand-logo footer-logo" aria-label="Convite Premium — início"><img src="assets/logo-convite-premium.webp" alt="Convite Premium — Experiências Interativas"></a><p>© <span id="year"></span> Convite Premium. Todos os direitos reservados.</p></footer>
   <a class="whatsapp-float js-whatsapp" href="#" aria-label="Falar no WhatsApp">💬</a>
 
+
+  <div class="modelos-overlay" id="modelosOverlay" hidden>
+    <section class="modelos-dialog" role="dialog" aria-modal="true" aria-labelledby="modelosTitle">
+      <button type="button" class="modelos-close" id="modelosClose" aria-label="Fechar modelos">×</button>
+      <span class="modelos-kicker">CONVITES PREMIUM · GALERIA</span>
+      <h2 id="modelosTitle">Convites</h2>
+      <p class="modelos-instrucao">Use as setas para trazer o próximo modelo para frente.</p>
+      <div class="modelos-stage" id="modelosStage" aria-live="polite"></div>
+      <div class="modelos-controls">
+        <button type="button" id="modelosPrev" aria-label="Modelo anterior">‹</button>
+        <span id="modelosPosition">1 de 4</span>
+        <button type="button" id="modelosNext" aria-label="Próximo modelo">›</button>
+      </div>
+      <p class="modelos-dica">Toque no cartão da frente para abrir o convite ou personalizar o seu.</p>
+    </section>
+  </div>
   <div class="pedido-overlay" id="pedidoOverlay" hidden>
     <section class="pedido-dialog" role="dialog" aria-modal="true" aria-labelledby="pedidoTitle">
       <button class="pedido-close" type="button" id="pedidoClose" aria-label="Fechar formulário">×</button>
