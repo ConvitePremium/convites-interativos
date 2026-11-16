@@ -134,27 +134,31 @@ function itensDaCategoria(categoria) {
   itens.push({titulo:'Crie seu próprio modelo', personalizado:true});
   return itens;
 }
-const POSICOES_MODELOS = [
+// Os cartões são criados uma única vez: recriá-los a cada clique impedia a transição CSS.
+const camadasModelos = [
   {x:0,y:0,angle:0,scale:1},
   {x:36,y:4,angle:8,scale:.97},
   {x:-36,y:8,angle:-8,scale:.94},
   {x:52,y:12,angle:12,scale:.91}
 ];
-let animandoModelos = false;
 let cartoesModelos = [];
+let animandoModelos = false;
 function posicaoModelo(offset){
-  const p=POSICOES_MODELOS[offset];
-  return `translateX(calc(-50% + ${p.x}px)) translateY(${p.y}px) rotate(${p.angle}deg) scale(${p.scale})`;
+  const c=camadasModelos[offset];
+  return `translateX(calc(-50% + ${c.x}px)) translateY(${c.y}px) rotate(${c.angle}deg) scale(${c.scale})`;
+}
+function aplicarCamada(card,offset){
+  card.style.transform=posicaoModelo(offset);
+  card.style.zIndex=String(10-offset);
+  card.setAttribute('aria-hidden',offset===0?'false':'true');
+  card.tabIndex=offset===0?0:-1;
 }
 function renderizarModelos(){
   const itens=itensDaCategoria(categoriaAtual);
-  modelosStage.replaceChildren();
-  cartoesModelos=[];
-  for(let i=0;i<itens.length;i++){
-    const item=itens[i];
+  modelosStage.replaceChildren();cartoesModelos=[];animandoModelos=false;
+  itens.forEach((item,index)=>{
     const card=document.createElement('button');
     card.type='button';card.className='modelo-card';
-    card.dataset.modeloIndex=String(i);
     card.setAttribute('aria-label',item.titulo);
     if(item.personalizado){
       card.classList.add('modelo-personalizado');
@@ -168,66 +172,65 @@ function renderizarModelos(){
       info.append(titulo,detalhe);card.appendChild(info);
     }
     card.addEventListener('click',()=>{
-      if(animandoModelos || Number(card.dataset.modeloIndex)!==modeloAtual)return;
+      if(animandoModelos||index!==modeloAtual)return;
       if(item.personalizado){fecharModelos();abrirPedido({preventDefault(){},currentTarget:galeriaTrigger});return;}
       if(!item.link){alert('Este exemplo ainda será adicionado. Use as setas para ver outros modelos.');return;}
       window.open(item.link,'_blank','noopener,noreferrer');
     });
-    modelosStage.appendChild(card);cartoesModelos.push(card);
-  }
-  posicionarModelos();
-}
-function posicionarModelos(){
-  cartoesModelos.forEach((card,i)=>{
-    const offset=(i-modeloAtual+cartoesModelos.length)%cartoesModelos.length;
-    card.style.transform=posicaoModelo(offset);
-    card.style.zIndex=String(10-offset);
-    card.style.opacity='1';
-    card.tabIndex=offset===0?0:-1;
-    if(offset===0)card.removeAttribute('aria-hidden');
-    else card.setAttribute('aria-hidden','true');
+    cartoesModelos.push(card);modelosStage.appendChild(card);
   });
-  modelosPosition.textContent=`${modeloAtual+1} de ${cartoesModelos.length}`;
+  cartoesModelos.forEach((card,index)=>aplicarCamada(card,(index-modeloAtual+4)%4));
+  modelosPosition.textContent=`${modeloAtual+1} de ${itens.length}`;
 }
 function navegarModelos(direcao){
-  if(animandoModelos || modelosOverlay.hidden)return;
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    modeloAtual=(modeloAtual+direcao+4)%4;posicionarModelos();return;
-  }
+  if(animandoModelos||modelosOverlay.hidden)return;
   animandoModelos=true;
   const anterior=modeloAtual;
   const proximo=(anterior+direcao+4)%4;
+  const duracao=680;
+  const saida=cartoesModelos[anterior];
+  // A capa da frente sai pela lateral, liberando a que vem de trás.
+  // Os demais cartões animam de sua camada atual até a próxima.
   const animacoes=[];
-  cartoesModelos.forEach((card,i)=>{
-    const de=(i-anterior+4)%4;
-    const para=(i-proximo+4)%4;
-    const sai=de===0;
-    const entra=para===0;
-    const origem=posicaoModelo(de), destino=posicaoModelo(para);
-    // O cartão da frente abre espaço; o de trás avança com escala e rotação suaves.
-    const frames=sai ? [
-      {transform:origem,opacity:1,offset:0},
-      {transform:`translateX(calc(-50% + ${direcao===1?-105:105}px)) translateY(-8px) rotate(${direcao===1?-12:12}deg) scale(1.035)`,opacity:1,offset:.38},
-      {transform:destino,opacity:1,offset:1}
-    ] : [
-      {transform:origem,opacity:1},
-      {transform:destino,opacity:1}
-    ];
-    card.style.zIndex=String(sai?20:entra?19:10-para);
-    const anim=card.animate(frames,{duration:650,easing:'cubic-bezier(.22,.72,.18,1)',fill:'forwards'});
-    animacoes.push(anim.finished.catch(()=>{}));
+  cartoesModelos.forEach((card,index)=>{
+    const origem=(index-anterior+4)%4;
+    const destino=(index-proximo+4)%4;
+    const inicial=posicaoModelo(origem);
+    const final=posicaoModelo(destino);
+    card.style.transition='none';
+    if(index===anterior){
+      card.style.zIndex='30';
+      const lateral=direcao===1?-1:1;
+      const meio=`translateX(calc(-50% + ${lateral*155}px)) translateY(-15px) rotate(${lateral*15}deg) scale(1.035)`;
+      animacoes.push(card.animate([
+        {transform:inicial,offset:0,opacity:1},
+        {transform:meio,offset:.46,opacity:.95},
+        {transform:final,offset:1,opacity:1}
+      ],{duration:duracao,easing:'ease-in-out',fill:'forwards'}));
+    }else{
+      card.style.zIndex=String(10-destino);
+      animacoes.push(card.animate([
+        {transform:inicial,opacity:origem===3?.87:1},
+        {transform:final,opacity:1}
+      ],{duration:duracao,easing:'cubic-bezier(.22,.7,.2,1)',fill:'forwards'}));
+    }
   });
-  Promise.all(animacoes).then(()=>{
-    modeloAtual=proximo;
-    cartoesModelos.forEach(card=>card.getAnimations().forEach(a=>a.cancel()));
-    posicionarModelos();animandoModelos=false;
+  modeloAtual=proximo;
+  modelosPosition.textContent=`${modeloAtual+1} de 4`;
+  Promise.all(animacoes.map(a=>a.finished.catch(()=>{}))).then(()=>{
+    animacoes.forEach(a=>a.cancel());
+    cartoesModelos.forEach((card,index)=>{
+      aplicarCamada(card,(index-modeloAtual+4)%4);
+      card.style.transition='';card.style.opacity='';
+    });
+    animandoModelos=false;
   });
 }
 function abrirModelos(e){
   e.preventDefault();galeriaTrigger=e.currentTarget;
   categoriaAtual=e.currentTarget.dataset.demo;modeloAtual=0;
   modelosTitle.textContent=nomesCategorias[categoriaAtual];
-  modelosOverlay.hidden=false;document.body.classList.add('modelos-open');animandoModelos=false;
+  modelosOverlay.hidden=false;document.body.classList.add('modelos-open');
   renderizarModelos();document.getElementById('modelosClose').focus();
 }
 function fecharModelos(){
@@ -237,17 +240,17 @@ function fecharModelos(){
 document.querySelectorAll('.js-category-link').forEach(link=>link.addEventListener('click',abrirModelos));
 document.getElementById('modelosClose').addEventListener('click',fecharModelos);
 modelosOverlay.addEventListener('click',e=>{if(e.target===modelosOverlay)fecharModelos();});
-document.getElementById('modelosPrev').addEventListener('click',()=>navegarModelos(-1));
-document.getElementById('modelosNext').addEventListener('click',()=>navegarModelos(1));
+document.getElementById('modelosPrev').addEventListener('click',()=>{navegarModelos(-1);});
+document.getElementById('modelosNext').addEventListener('click',()=>{navegarModelos(1);});
 document.addEventListener('keydown',e=>{
   if(modelosOverlay.hidden)return;
   if(e.key==='Escape')fecharModelos();
-  if(e.key==='ArrowRight')navegarModelos(1);
-  if(e.key==='ArrowLeft')navegarModelos(-1);
+  if(e.key==='ArrowRight'){navegarModelos(1);}
+  if(e.key==='ArrowLeft'){navegarModelos(-1);}
 });
 let touchX=0;
 modelosStage.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;},{passive:true});
-modelosStage.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>45)navegarModelos(delta<0?1:-1);},{passive:true});
+modelosStage.addEventListener('touchend',e=>{const delta=e.changedTouches[0].clientX-touchX;if(Math.abs(delta)>45){navegarModelos(delta<0?1:-1);}},{passive:true});
 
 document.getElementById('year').textContent = new Date().getFullYear();
 

@@ -85,6 +85,6 @@ body.modelos-open{overflow:hidden}
   .modelo-card{border-radius:8px}
 }
 
-/* Movimento gerenciado pelo navegador: preserva 9:16 e evita saltos ao trocar cartões. */
-.modelo-card{transition:none!important;will-change:transform;backface-visibility:hidden}
+/* V3: animação real de troca de profundidade, preservando proporção 9:16 */
+.modelo-card{will-change:transform;backface-visibility:hidden;transition:none!important;}
 @media(prefers-reduced-motion:reduce){.modelo-card{will-change:auto}}
