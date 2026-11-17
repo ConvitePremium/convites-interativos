@@ -188,16 +188,16 @@
       <button class="pedido-close" type="button" id="pedidoClose" aria-label="Fechar formulário">×</button>
       <span class="pedido-kicker">CONVITES PREMIUM</span>
       <h2 id="pedidoTitle">Personalize seu convite</h2>
-      <p>Preencha os detalhes da festa e escolha os adicionais que desejar.</p>
+      <p id="pedidoDescricao">Informe os detalhes da sua festa para começar.</p><div class="pedido-progress"><span id="pedidoEtapaIndicador">Etapa 1 de 2 — Personalização</span><div class="pedido-progress-track"><div id="pedidoProgressFill"></div></div></div>
       <form id="pedidoForm">
-        <div class="pedido-fields">
+        <div class="pedido-step" id="pedidoStep1"><div class="pedido-fields">
           <label>Nome da aniversariante<input name="nome" required maxlength="100" placeholder="Nome da aniversariante"></label>
           <label>Idade que vai completar<input name="idade" type="number" required min="1" max="120" placeholder="Ex.: 15"></label>
           <label>Data do evento<input name="data" type="date" required></label>
           <label>Horário da festa<input name="horario" type="time" required></label>
           <label class="pedido-wide">Tema e cores da festa<textarea name="tema" required rows="2" maxlength="350" placeholder="Ex.: Jardim encantado, rosa bebê e dourado"></textarea></label>
         </div>
-        <h3>Deseja adicionar algo ao convite?</h3>
+        <button class="pedido-submit" id="pedidoNext" type="button">Próximo →</button></div><div class="pedido-step" id="pedidoStep2" hidden><div class="pedido-support"><strong>Suporte até o dia do aniversário</strong><p>Oferecemos suporte para alterações de data, local e horário da festa até o dia do aniversário.</p></div><h3>Deseja adicionar algo ao convite?</h3>
         <div class="pedido-extra"><div><strong>Save the Date</strong><b>R$ 19,90</b></div><button type="button" class="pedido-info" aria-expanded="false" aria-controls="infoSave">Saiba mais</button><p id="infoSave" hidden>Um aviso digital enviado antecipadamente para que os convidados reservem a data da sua festa.</p><label class="pedido-check"><input type="checkbox" name="save"> Incluir Save the Date</label></div>
         <div class="pedido-extra"><div><strong>Álbum Online + QR Code de Mesa</strong><b>R$ 39,90</b></div><button type="button" class="pedido-info" aria-expanded="false" aria-controls="infoAlbum">Saiba mais</button><p id="infoAlbum" hidden>Os convidados escaneiam o QR Code disponível nas mesas para enviar fotos a um álbum digital compartilhado da festa.</p><label class="pedido-check"><input type="checkbox" name="album"> Incluir Álbum Online + QR Code de Mesa</label></div>
         <div id="pedidoCombo" class="pedido-combo" hidden aria-live="polite">
@@ -206,7 +206,7 @@
           <small>Convite + Save the Date + Álbum Online com QR Code de Mesa</small>
         </div>
         <p class="pedido-total" id="pedidoTotal" aria-live="polite">Convite: R$ 99,90 | Adicionais: R$ 0,00 | Total: R$ 99,90</p>
-        <button class="pedido-submit" type="submit">Enviar pedido pelo WhatsApp</button>
+        <div class="pedido-actions"><button class="pedido-back" id="pedidoBack" type="button">← Voltar</button><button class="pedido-submit" type="submit">Enviar pedido pelo WhatsApp</button></div></div>
       </form>
     </section>
   </div>

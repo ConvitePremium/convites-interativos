@@ -6,10 +6,29 @@ const pedidoOverlay = document.getElementById('pedidoOverlay');
 const pedidoForm = document.getElementById('pedidoForm');
 const pedidoClose = document.getElementById('pedidoClose');
 let pedidoTrigger = null;
+const pedidoStep1 = document.getElementById('pedidoStep1');
+const pedidoStep2 = document.getElementById('pedidoStep2');
+function mostrarEtapa(etapa) {
+ pedidoStep1.hidden = etapa !== 1;
+ pedidoStep2.hidden = etapa !== 2;
+ document.getElementById('pedidoEtapaIndicador').textContent = etapa === 1 ? 'Etapa 1 de 2 — Personalização' : 'Etapa 2 de 2 — Adicionais e valores';
+ document.getElementById('pedidoProgressFill').style.width = etapa === 1 ? '50%' : '100%';
+ document.getElementById('pedidoDescricao').textContent = etapa === 1 ? 'Informe os detalhes da sua festa para começar.' : 'Confira o suporte incluso, escolha os adicionais e revise o valor total.';
+ document.querySelector('.pedido-dialog').scrollTop = 0;
+}
+function validarPrimeiraEtapa() {
+ for (const campo of pedidoStep1.querySelectorAll('input, textarea')) {
+  if (!campo.checkValidity()) { campo.reportValidity(); campo.focus(); return false; }
+ }
+ return true;
+}
+document.getElementById('pedidoNext').addEventListener('click', () => { if (validarPrimeiraEtapa()) mostrarEtapa(2); });
+document.getElementById('pedidoBack').addEventListener('click', () => mostrarEtapa(1));
 function abrirPedido(event) {
   event.preventDefault();
   pedidoTrigger = event.currentTarget;
   pedidoOverlay.hidden = false;
+  mostrarEtapa(1);
   document.body.classList.add('pedido-open');
   pedidoForm.elements.nome.focus();
 }
@@ -66,6 +85,7 @@ pedidoForm.elements.album.addEventListener('change', atualizarTotal);
 atualizarTotal();
 pedidoForm.addEventListener('submit', event => {
   event.preventDefault();
+  if (!validarPrimeiraEtapa()) { mostrarEtapa(1); validarPrimeiraEtapa(); return; }
   if (!pedidoForm.reportValidity()) return;
   if (!number) { alert('Configure o número do WhatsApp no config.js.'); return; }
   const fields = pedidoForm.elements;

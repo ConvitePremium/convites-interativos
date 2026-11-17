@@ -88,3 +88,5 @@ body.modelos-open{overflow:hidden}
 /* V3: animação real de troca de profundidade, preservando proporção 9:16 */
 .modelo-card{will-change:transform;backface-visibility:hidden;transition:none!important;}
 @media(prefers-reduced-motion:reduce){.modelo-card{will-change:auto}}
+
+.pedido-step[hidden]{display:none!important}.pedido-progress{margin:16px 0 20px;color:#735b72;font-size:12px;font-weight:800}.pedido-progress-track{height:5px;background:#eee4e9;border-radius:9px;margin-top:9px;overflow:hidden}#pedidoProgressFill{width:50%;height:100%;background:#9d153f;transition:width .3s ease}.pedido-step>.pedido-submit{margin-top:22px}.pedido-support{background:#f7f2e7;border:1px solid #e6d7b8;border-radius:14px;padding:16px;margin:18px 0}.pedido-support strong{color:#102448}.pedido-support p{color:#5d6676;font-size:14px;line-height:1.6;margin:8px 0 0}.pedido-actions{display:flex;gap:10px;align-items:stretch;margin-top:14px}.pedido-actions .pedido-submit{flex:1}.pedido-back{border:1px solid #c9c3b8;background:#fff;color:#102448;border-radius:12px;padding:12px 18px;font-weight:800;cursor:pointer}@media(max-width:420px){.pedido-actions{flex-direction:column}}
